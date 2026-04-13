@@ -187,6 +187,7 @@ app.post('/payment', async (req, res) => {
     dup.forEach((r)  => messages.push(`⚠️ ${r.name} ${r.date} 이미 등록됨 (${r.time_slot})`));
     full.forEach((r) => messages.push(`❌ ${r.name} ${r.date} 만석`));
 
+    console.log(`[POST /payment] ${messages.join(' | ')}`);
     const statusCode = ok.length > 0 ? 201 : 409;
     return res.status(statusCode).json({ success: ok.length > 0, message: messages.join('\n'), results });
   } catch (err) {
