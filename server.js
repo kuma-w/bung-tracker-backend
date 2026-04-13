@@ -103,6 +103,8 @@ function parseContent(content) {
 app.post('/payment', async (req, res) => {
   const { content, amount } = req.body;
 
+  console.log(`[POST /payment] 수신: content="${content}" amount=${amount}`);
+
   if (!content || amount === undefined) {
     return res.status(400).json({
       success: false,
