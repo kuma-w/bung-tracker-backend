@@ -11,13 +11,16 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testMatch": ["**/tests/**/*.test.js"]
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.18.2"
   },
