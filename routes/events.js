@@ -368,15 +368,18 @@ router.post('/events/:date/attendees', requireAdmin, async (req, res) => {
   }
 });
 
-/** DELETE /events/:date/attendees/:name — 관리자가 특정 벙에서 참석자 제거 */
+/** DELETE /events/:date/attendees/:name — 관리자가 특정 벙에서 참석자 제거
+ *  Query: ?slot_time=10:30  (생략 시 해당 날짜 전체 슬롯에서 삭제)
+ */
 router.delete('/events/:date/attendees/:name', requireAdmin, async (req, res) => {
   const { date, name } = req.params;
+  const { slot_time } = req.query;
   const decodedName = decodeURIComponent(name);
 
   try {
     const { data: event, error: evErr } = await supabase
       .from('events')
-      .select('event_slots(id)')
+      .select('event_slots(id, slot_time)')
       .eq('event_date', date)
       .single();
 
@@ -385,11 +388,21 @@ router.delete('/events/:date/attendees/:name', requireAdmin, async (req, res) =>
     }
     if (evErr) throw evErr;
 
-    const slotIds = event.event_slots.map((s) => s.id);
+    let targetSlotIds;
+    if (slot_time) {
+      const target = event.event_slots.find((s) => s.slot_time === slot_time);
+      if (!target) {
+        return res.status(404).json({ success: false, message: `${slot_time} 슬롯을 찾을 수 없습니다.` });
+      }
+      targetSlotIds = [target.id];
+    } else {
+      targetSlotIds = event.event_slots.map((s) => s.id);
+    }
+
     const { error, count } = await supabase
       .from('attendees')
       .delete({ count: 'exact' })
-      .in('event_slot_id', slotIds)
+      .in('event_slot_id', targetSlotIds)
       .eq('name', decodedName);
     if (error) throw error;
 
