@@ -53,18 +53,18 @@ async function updatePayment(id, fields) {
  * Body: { "content": "홍길동 김철수 0416", "amount": 3000 }
  */
 router.post('/payment', async (req, res) => {
-  const { content, amount } = req.body;
-  console.log(`[POST /payment] 수신: content="${content}" amount=${amount}`);
+  const { content } = req.body;
+  console.log(`[POST /payment] 수신: content="${content}"`);
 
-  if (!content || amount === undefined) {
-    return res.status(400).json({ success: false, message: 'content, amount 필드가 모두 필요합니다.' });
+  if (!content) {
+    return res.status(400).json({ success: false, message: 'content 필드가 필요합니다.' });
   }
 
   const rawContent = String(content);
-  const { names, dates, slotIndex } = parseContent(rawContent);
+  const { names, dates, slotIndex, amount } = parseContent(rawContent);
 
   // 파싱 실패 — failed로 저장 후 반환
-  if (names.length === 0 || dates.length === 0) {
+  if (names.length === 0 || dates.length === 0 || amount === null) {
     const failReason = `파싱 실패 — ${names.length === 0 ? '이름' : '날짜'}을 찾을 수 없습니다.`;
     const paymentId = await savePayment({
       raw_content: rawContent,
