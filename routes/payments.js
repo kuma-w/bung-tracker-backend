@@ -198,10 +198,6 @@ router.post('/payments/:id/assign', requireAdmin, async (req, res) => {
     }
     if (payErr) throw payErr;
 
-    if (payment.status === 'assigned') {
-      return res.status(409).json({ success: false, message: '이미 완전히 배정된 입금입니다.' });
-    }
-
     const results = await assignToSlots(names, dates, paymentId, slotIndex, slot_time);
     const status = derivePaymentStatus(results);
     await updatePayment(paymentId, {
